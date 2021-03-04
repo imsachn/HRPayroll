@@ -22,7 +22,7 @@ object Main {
           println("current_salary : { ")
           salaryHikeService.salaryCalculations(currentSalary)
           println("incremented_salary : { " )
-            salaryHikeService.salaryCalculations(currentSalary+salaryHikeService.hikeCalculations(currentSalary,totalExp,hashedinExp,promotion))
+            salaryHikeService.hikeCalculations(currentSalary,totalExp,hashedinExp,promotion)
 
         } catch {
           case e: Exception => println(e)

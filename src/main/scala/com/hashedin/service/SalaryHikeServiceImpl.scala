@@ -5,39 +5,48 @@ import com.hashedin.Utils.Reader
 import scala.collection.mutable.ListBuffer
 
 class SalaryHikeServiceImpl extends SalaryHikeService{
-  private val basicSalary=40:Double
-  private val hra=20:Double
-  private val lta=8:Double
-  private val phoneAndInternet=7:Double
-  private val others=25:Double
-  private var salaryHikeDetail: ListBuffer[SalaryInfo] = _
+
+  var salaryHikeDetail: Map[Double,SalaryInfo] = _
+
+  object SalaryHikeServiceImpl{
+    var basicSalary=40:Double
+    var hra=20:Double
+    var lta=8:Double
+    var phoneAndInternet=7:Double
+    var others=25:Double
+
+  }
 
   override def salaryCalculations(salary: Double): Unit ={
-    println("total: " + salary)
-    println("basic_salary: " + salary * (basicSalary/100))
-    println("HRA: " + salary * (hra/100))
-    println("LTA: " + salary * (lta/100))
-    println("Phone_and_internet: " + salary*(phoneAndInternet/100))
-    println("other: " + salary * (others/100) +" }")
+
+    println(f" total: $salary%.2f ," +
+      f"basic_salary: ${salary * (SalaryHikeServiceImpl.basicSalary/100)}%.2f ," +
+      f"HRA: ${salary * (SalaryHikeServiceImpl.hra/100)}%.2f ," +
+      f"LTA: ${salary * (SalaryHikeServiceImpl.lta/100)}%.2f ," +
+      f"Phone_and_internet: ${salary * (SalaryHikeServiceImpl.phoneAndInternet/100)}%.2f ," +
+      f"other: ${salary * (SalaryHikeServiceImpl.others/100)}%.2f }"
+    )
+    //string Multiline interpole
   }
-  override def hikeCalculations(currentSalary: Int, totalExp: Double, hashedinExp: Double, promotion: Boolean): Double = {
-    val totalExpFilter = salaryHikeDetail.filter(x => x.hashedinExp == totalExp)
-    val hashedinExpFilter = salaryHikeDetail.filter(x => x.hashedinExp == hashedinExp)
+  override def hikeCalculations(currentSalary: Double, totalExp: Double, hashedinExp: Double, promotion: Boolean): Unit = {
+
     var hikeSalary = 0.0
-    if (totalExpFilter.isEmpty||hashedinExpFilter.isEmpty) {
-      print("No Hike for mentioned total Experience " )
+    if (!salaryHikeDetail.contains(totalExp)) {
+      print("No Hike for mentioned total Experience " +totalExp)
     }
-      else {
-        if (promotion) {
-          hikeSalary = currentSalary * (totalExpFilter.head.normalHike / 100 + hashedinExpFilter.head.hashedinExpBonus / 100 + totalExpFilter.head.promotionBonus / 100)
-        } else {
-          hikeSalary = currentSalary * (totalExpFilter.head.normalHike / 100 + hashedinExpFilter.head.hashedinExpBonus / 100)
-        }
+    else {
+      val hikeInfo=salaryHikeDetail.get(totalExp)
+      if (promotion) {
+        hikeSalary = currentSalary * (hikeInfo.head.normalHike / 100 + hikeInfo.head.hashedinExpBonus / 100 + hikeInfo.head.promotionBonus / 100)
+      } else {
+        hikeSalary = currentSalary * (hikeInfo.head.normalHike / 100 + hikeInfo.head.hashedinExpBonus / 100)
       }
-    hikeSalary
+    }
+    salaryCalculations(hikeSalary+currentSalary)
   }
   override def salaryHikeDetails(fileName: String): Unit = {
     val reader= new Reader()
     salaryHikeDetail = reader.read(fileName)
   }
+
 }
